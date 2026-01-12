@@ -4,7 +4,7 @@ import { DifficultyLevel } from "../types";
 const getClient = () => {
   const apiKey = process.env.API_KEY;
   if (!apiKey) {
-    throw new Error("API Key is missing. Please check your environment variables.");
+    throw new Error("API Key is missing.");
   }
   return new GoogleGenAI({ apiKey });
 };
@@ -31,38 +31,36 @@ export const generateLegalFlashcards = async (
   let difficultyInstruction = "";
   switch (difficultyMode) {
     case 'easy':
-        difficultyInstruction = "Gere APENAS questões de nível FÁCIL (easy). Foco na literalidade direta, conceitos básicos e preenchimento de lacunas óbvias da lei.";
+        difficultyInstruction = "Nível FÁCIL: Literalidade direta. Complete a lacuna ou pergunta direta sobre o texto da lei.";
         break;
     case 'medium':
-        difficultyInstruction = "Gere APENAS questões de nível MÉDIO (medium). Crie pequenos casos práticos simples ou cobre distinções entre conceitos.";
+        difficultyInstruction = "Nível MÉDIO: Aplicação direta em casos simples ou distinção entre conceitos próximos da lei.";
         break;
     case 'hard':
-        difficultyInstruction = "Gere APENAS questões de nível DIFÍCIL (hard). Foque em exceções, prazos específicos, combinações de parágrafos/incisos, ou 'pegadinhas' sutis da lei seca.";
+        difficultyInstruction = "Nível DIFÍCIL: Exceções, prazos específicos, combinações de parágrafos e 'pegadinhas' clássicas de concursos.";
         break;
     case 'mixed':
-        difficultyInstruction = "Gere uma mistura equilibrada: aprox. 30% fáceis, 40% médias e 30% difíceis.";
+        difficultyInstruction = "Mistura equilibrada de dificuldades (Fácil, Médio e Difícil).";
         break;
   }
 
   const prompt = `
-    Gere ${quantity} flashcards para estudo de concursos públicos.
-    Matéria Principal: "${subject}".
-    Assunto Específico: "${topic}".
+    Atue como um especialista em elaboração de questões para concursos jurídicos de alto nível (Magistratura, MP, Defensoria).
+    Gere ${quantity} flashcards focados EXCLUSIVAMENTE na "Lei Seca" (texto literal) brasileira.
     
-    Diretrizes de Dificuldade:
-    ${difficultyInstruction}
+    Matéria: "${subject}"
+    Assunto: "${topic}"
+    Diretrizes: ${difficultyInstruction}
     
-    Requisitos OBRIGATÓRIOS:
-    1. Baseie-se estritamente na "Lei Seca" (texto literal da lei) ou Tratados Internacionais.
-    2. O campo "front" (frente) deve ser uma pergunta objetiva.
-       - Se for Difícil/Médio: Tente elaborar um pequeno enunciado ou situação hipotética.
-    3. Gere 4 opções de resposta curtas no campo "options".
-    4. Indique a resposta correta no campo "correctAnswer".
-    5. O campo "back" (verso) deve conter a explicação.
-    6. O campo "legalText" deve conter a cópia literal do artigo de lei. Use markdown (**negrito**) para grifar a resposta.
-    7. O campo "difficulty" deve ser preenchido com 'easy', 'medium' ou 'hard' para cada carta.
-    8. O campo "legalReference" deve citar o artigo e a lei.
-    9. Use a ferramenta de busca para garantir legislação atualizada.
+    REQUISITOS TÉCNICOS:
+    1. O "front" deve ser uma pergunta clara e desafiadora.
+    2. O "options" deve conter 4 alternativas plausíveis.
+    3. O "correctAnswer" deve ser a alternativa correta exata.
+    4. O "back" deve explicar POR QUE aquela é a resposta, citando a lógica da lei.
+    5. O "legalText" deve ser o ARTIGO COMPLETO da lei. Use markdown **negrito** para destacar a parte que responde à pergunta.
+    6. O "legalReference" deve seguir o padrão: "Art. X, Lei Y" (Ex: Art. 121, CP).
+    
+    Responda APENAS em JSON seguindo o esquema fornecido.
   `;
 
   try {
@@ -77,13 +75,13 @@ export const generateLegalFlashcards = async (
           items: {
             type: Type.OBJECT,
             properties: {
-              front: { type: Type.STRING, description: "A pergunta." },
-              options: { type: Type.ARRAY, items: { type: Type.STRING }, description: "4 alternativas." },
-              correctAnswer: { type: Type.STRING, description: "Alternativa correta." },
-              back: { type: Type.STRING, description: "Explicação." },
-              legalText: { type: Type.STRING, description: "Texto de lei com grifos markdown." },
-              legalReference: { type: Type.STRING, description: "Ref. legal (Art. X)." },
-              difficulty: { type: Type.STRING, enum: ["easy", "medium", "hard"], description: "Nível da questão." }
+              front: { type: Type.STRING },
+              options: { type: Type.ARRAY, items: { type: Type.STRING } },
+              correctAnswer: { type: Type.STRING },
+              back: { type: Type.STRING },
+              legalText: { type: Type.STRING },
+              legalReference: { type: Type.STRING },
+              difficulty: { type: Type.STRING, enum: ["easy", "medium", "hard"] }
             },
             required: ["front", "back", "legalText", "legalReference", "options", "correctAnswer", "difficulty"],
           },
@@ -92,13 +90,11 @@ export const generateLegalFlashcards = async (
     });
 
     if (response.text) {
-      const data = JSON.parse(response.text) as GeneratedCardData[];
-      return data;
+      return JSON.parse(response.text) as GeneratedCardData[];
     }
-    
     return [];
   } catch (error) {
-    console.error("Error generating flashcards:", error);
+    console.error("Erro na geração Gemini:", error);
     throw error;
   }
 };
