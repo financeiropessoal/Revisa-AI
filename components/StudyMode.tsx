@@ -355,7 +355,7 @@ export const StudyMode: React.FC<StudyModeProps> = ({ deck, onExit, onMarkStudie
                 {currentCard.legalText && (
                     <div>
                          <h4 className="text-amber-500 text-xs uppercase font-bold mb-2 flex items-center gap-1">
-                            <Scale size={14} /> Lei Seca
+                            <Scale size={14} /> Flashcards com base na Lei Seca
                          </h4>
                          <div className="font-serif italic text-slate-300 text-base leading-relaxed p-3 bg-slate-800/50 rounded border-l-2 border-amber-500">
                             <RenderText text={currentCard.legalText} />
