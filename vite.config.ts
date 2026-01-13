@@ -4,11 +4,14 @@ import react from '@vitejs/plugin-react';
 export default defineConfig({
   plugins: [react()],
   define: {
-    // Permite que process.env.API_KEY funcione no navegador
+    // Injeta a API_KEY configurada na Vercel para dentro do código
     'process.env.API_KEY': JSON.stringify(process.env.API_KEY || ''),
+  },
+  server: {
+    port: 3000,
   },
   build: {
     outDir: 'dist',
-    sourcemap: false,
-  },
+    target: 'esnext'
+  }
 });
