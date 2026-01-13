@@ -1,5 +1,4 @@
-
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Deck, ViewState, Flashcard, DifficultyLevel } from './types';
 import { getDecks, saveDecks, createDeck, createFlashcard } from './services/storageService';
 import { DeckList } from './components/DeckList';
@@ -17,19 +16,28 @@ const App: React.FC = () => {
   const [showGenerator, setShowGenerator] = useState(false);
   const [generatorMode, setGeneratorMode] = useState<'NEW_DECK' | 'ADD_TO_DECK'>('NEW_DECK');
   const [tempDeck, setTempDeck] = useState<Deck | null>(null);
+  const [isLoaded, setIsLoaded] = useState(false);
 
+  // 1. Carregamento inicial (apenas uma vez)
   useEffect(() => {
     const loadedDecks = getDecks();
-    setDecks(loadedDecks);
+    if (loadedDecks && Array.isArray(loadedDecks)) {
+      setDecks(loadedDecks);
+    }
+    setIsLoaded(true);
   }, []);
 
+  // 2. Persistência segura (evita loops infinitos)
   useEffect(() => {
-    if (decks.length > 0) {
+    if (isLoaded) {
       saveDecks(decks);
     }
-  }, [decks]);
+  }, [decks, isLoaded]);
 
-  const activeDeck = tempDeck || decks.find(d => d.id === selectedDeckId);
+  // 3. Seleção de Deck Ativo com Memoização para performance
+  const activeDeck = useMemo(() => {
+    return tempDeck || decks.find(d => d.id === selectedDeckId) || null;
+  }, [tempDeck, decks, selectedDeckId]);
 
   // --- Handlers ---
 
@@ -39,156 +47,104 @@ const App: React.FC = () => {
   };
 
   const handleSelectDeck = (deck: Deck) => {
-    setTempDeck(null); // Ensure no temp deck is active
+    setTempDeck(null);
     setSelectedDeckId(deck.id);
     setView(ViewState.DECK_DETAILS);
   };
 
   const handleDeleteDeck = (deckId: string) => {
     if (window.confirm("Tem certeza que deseja excluir este baralho?")) {
-      const newDecks = decks.filter(d => d.id !== deckId);
-      setDecks(newDecks);
-      if (newDecks.length === 0) {
-          localStorage.removeItem('leiseca_decks_v1');
-      } else {
-          saveDecks(newDecks); // Explicitly save immediately
-      }
-      
-      // If deleting currently viewed deck
+      setDecks(prev => prev.filter(d => d.id !== deckId));
       if (selectedDeckId === deckId) {
-          setSelectedDeckId(null);
-          setView(ViewState.DASHBOARD);
+        setSelectedDeckId(null);
+        setView(ViewState.DASHBOARD);
       }
     }
   };
 
   const handleDeleteSubject = (subjectName: string) => {
-    if (window.confirm(`ATENÇÃO: Tem certeza que deseja excluir a matéria "${subjectName}" e TODOS os seus baralhos?\n\nEsta ação não pode ser desfeita.`)) {
-        const newDecks = decks.filter(d => (d.subject || "Geral") !== subjectName);
-        setDecks(newDecks);
-        if (newDecks.length === 0) {
-            localStorage.removeItem('leiseca_decks_v1');
-        } else {
-            saveDecks(newDecks);
-        }
+    if (window.confirm(`Excluir a matéria "${subjectName}" e TODOS os seus baralhos?`)) {
+      setDecks(prev => prev.filter(d => (d.subject || "Geral") !== subjectName));
+      setView(ViewState.DASHBOARD);
     }
   };
 
   const handleAddManualCard = (front: string, back: string, ref: string, legalText: string, difficulty?: DifficultyLevel) => {
     if (!selectedDeckId) return;
     const newCard = createFlashcard(front, back, ref, legalText, undefined, undefined, difficulty);
-    setDecks(prev => prev.map(deck => {
-      if (deck.id === selectedDeckId) {
-        return { ...deck, cards: [...deck.cards, newCard] };
-      }
-      return deck;
-    }));
+    setDecks(prev => prev.map(deck => 
+      deck.id === selectedDeckId ? { ...deck, cards: [...deck.cards, newCard] } : deck
+    ));
   };
-  
+
   const handleEditCard = (cardId: string, updates: Partial<Flashcard>) => {
     if (!selectedDeckId) return;
-    setDecks(prev => prev.map(deck => {
-        if (deck.id === selectedDeckId) {
-            return {
-                ...deck,
-                cards: deck.cards.map(c => c.id === cardId ? { ...c, ...updates } : c)
-            };
-        }
-        return deck;
-    }));
+    setDecks(prev => prev.map(deck => 
+      deck.id === selectedDeckId ? {
+        ...deck,
+        cards: deck.cards.map(c => c.id === cardId ? { ...c, ...updates } : c)
+      } : deck
+    ));
   };
 
   const handleDeleteCard = (cardId: string) => {
     if (!selectedDeckId) return;
-     setDecks(prev => prev.map(deck => {
-      if (deck.id === selectedDeckId) {
-        return { ...deck, cards: deck.cards.filter(c => c.id !== cardId) };
-      }
-      return deck;
-    }));
+    setDecks(prev => prev.map(deck => 
+      deck.id === selectedDeckId ? { ...deck, cards: deck.cards.filter(c => c.id !== cardId) } : deck
+    ));
   };
 
   const handleCardResult = (cardId: string, isCorrect: boolean) => {
     const now = Date.now();
-    
     setDecks(prev => prev.map(deck => {
-        // Only modify if deck contains the card
-        const hasCard = deck.cards.some(c => c.id === cardId);
-        if (!hasCard) return deck;
+      if (!deck.cards.some(c => c.id === cardId)) return deck;
+      return {
+        ...deck,
+        cards: deck.cards.map(c => {
+          if (c.id !== cardId) return c;
+          let interval = c.interval || 0;
+          let easeFactor = c.easeFactor || 2.5;
 
-        return {
-            ...deck,
-            cards: deck.cards.map(c => {
-                if (c.id !== cardId) return c;
+          if (isCorrect) {
+            interval = interval === 0 ? 1 : interval === 1 ? 3 : Math.ceil(interval * easeFactor);
+            easeFactor = Math.min(easeFactor + 0.1, 5.0);
+          } else {
+            interval = 1;
+            easeFactor = Math.max(easeFactor - 0.2, 1.3);
+          }
 
-                // --- SRS Algorithm (Simplified SM-2) ---
-                let interval = c.interval || 0;
-                let easeFactor = c.easeFactor || 2.5;
-
-                if (isCorrect) {
-                    if (interval === 0) {
-                        interval = 1; // First success: 1 day
-                    } else if (interval === 1) {
-                        interval = 3; // Second success: 3 days
-                    } else {
-                        interval = Math.ceil(interval * easeFactor);
-                    }
-                    // Reward ease slightly for success
-                    easeFactor = Math.min(easeFactor + 0.1, 5.0); 
-                } else {
-                    // Reset on failure
-                    interval = 1; // Back to 1 day
-                    // Penalize ease
-                    easeFactor = Math.max(easeFactor - 0.2, 1.3);
-                }
-
-                // Calculate next review date (interval in days * ms)
-                const nextReview = now + (interval * 24 * 60 * 60 * 1000);
-
-                return {
-                    ...c,
-                    studied: true,
-                    studyHistory: [...(c.studyHistory || []), now],
-                    interval: interval,
-                    easeFactor: easeFactor,
-                    nextReviewDate: nextReview
-                };
-            })
-        };
+          return {
+            ...c,
+            studied: true,
+            studyHistory: [...(c.studyHistory || []), now],
+            interval,
+            easeFactor,
+            nextReviewDate: now + (interval * 24 * 60 * 60 * 1000)
+          };
+        })
+      };
     }));
   };
 
   const handleRandomReview = () => {
-    // Collect all cards from all decks
     const allCards = decks.flatMap(d => d.cards);
-    
     if (allCards.length === 0) {
-        alert("Crie ao menos um baralho com cartas para usar a revisão aleatória.");
-        return;
+      alert("Crie ao menos um baralho com cartas para usar a revisão aleatória.");
+      return;
     }
 
-    // Sort by Due Date (Overdue first)
-    const now = Date.now();
-    const sortedCards = [...allCards].sort((a, b) => {
-        const dateA = a.nextReviewDate || 0;
-        const dateB = b.nextReviewDate || 0;
-        return dateA - dateB;
-    });
-
-    // Take top 50 (most overdue)
-    const selectedCards = sortedCards.slice(0, 50);
-
+    const sortedCards = [...allCards].sort((a, b) => (a.nextReviewDate || 0) - (b.nextReviewDate || 0));
     const randomDeck: Deck = {
-        id: 'random-review-temp',
-        title: 'Revisão Inteligente',
-        subject: 'Misto',
-        description: 'Focada nos cards mais atrasados ou novos.',
-        cards: selectedCards,
-        createdAt: Date.now()
+      id: 'random-review-temp',
+      title: 'Revisão Inteligente',
+      subject: 'Misto',
+      description: 'Cards mais atrasados ou novos de todas as suas matérias.',
+      cards: sortedCards.slice(0, 50),
+      createdAt: Date.now()
     };
 
     setTempDeck(randomDeck);
-    setSelectedDeckId(null); 
+    setSelectedDeckId(null);
     setView(ViewState.STUDY_MODE);
   };
 
@@ -204,10 +160,11 @@ const App: React.FC = () => {
     ));
 
     if (generatorMode === 'NEW_DECK') {
-      const newDeck = createDeck(subject, topic, "Flashcards gerados via IA baseados em flashcards com base na Lei Seca.");
+      const newDeck = createDeck(subject, topic, "Flashcards gerados via IA baseados em Lei Seca.");
       newDeck.cards = newCards;
       setDecks(prev => [...prev, newDeck]);
-      setSelectedDeckId(newDeck.id); 
+      setSelectedDeckId(newDeck.id);
+      setView(ViewState.DECK_DETAILS);
     } else if (generatorMode === 'ADD_TO_DECK' && selectedDeckId) {
       setDecks(prev => prev.map(deck => {
         if (deck.id === selectedDeckId) {
@@ -226,30 +183,16 @@ const App: React.FC = () => {
     setShowGenerator(true);
   };
 
-  // Prepare deck for study mode (Sort by due date)
   const getStudyDeck = (): Deck | null => {
       if (!activeDeck) return null;
-      
-      // We create a shallow copy of the deck but with sorted cards
-      const sortedCards = [...activeDeck.cards].sort((a, b) => {
-          // Priority 1: Overdue cards (nextReviewDate < now)
-          // Priority 2: New cards (nextReviewDate == 0)
-          // Priority 3: Future cards
-          const dateA = a.nextReviewDate || 0;
-          const dateB = b.nextReviewDate || 0;
-          return dateA - dateB;
-      });
-
+      const sortedCards = [...activeDeck.cards].sort((a, b) => (a.nextReviewDate || 0) - (b.nextReviewDate || 0));
       return { ...activeDeck, cards: sortedCards };
   };
 
   const studyDeck = view === ViewState.STUDY_MODE ? getStudyDeck() : null;
 
-  // --- Render ---
-
   return (
     <div className="flex flex-col h-full bg-slate-50">
-      {/* Header */}
       <header className="bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between shrink-0 z-10 shadow-sm relative">
         <div className="flex items-center gap-3 cursor-pointer" onClick={() => { setView(ViewState.DASHBOARD); setSelectedDeckId(null); setTempDeck(null); }}>
           <div className="bg-primary text-white p-2 rounded-lg shadow-sm">
@@ -277,7 +220,6 @@ const App: React.FC = () => {
         </div>
       </header>
 
-      {/* Main Content */}
       <main className="flex-1 overflow-hidden relative">
         {view === ViewState.DASHBOARD && (
           <div className="h-full overflow-y-auto">
@@ -326,7 +268,6 @@ const App: React.FC = () => {
         )}
       </main>
 
-      {/* Modals */}
       {showGenerator && (
         <GeneratorModal
           onClose={() => setShowGenerator(false)}
