@@ -4,7 +4,7 @@ import { DifficultyLevel } from "../types";
 const getClient = () => {
   const apiKey = process.env.API_KEY;
   if (!apiKey) {
-    throw new Error("API Key is missing.");
+    throw new Error("API Key is missing. Please check your environment variables.");
   }
   return new GoogleGenAI({ apiKey });
 };
@@ -31,36 +31,45 @@ export const generateLegalFlashcards = async (
   let difficultyInstruction = "";
   switch (difficultyMode) {
     case 'easy':
-        difficultyInstruction = "Nível FÁCIL: Literalidade direta. Complete a lacuna ou pergunta direta sobre o texto da lei.";
+        difficultyInstruction = "Gere APENAS questões de nível FÁCIL (easy). Foco na literalidade direta, conceitos básicos e preenchimento de lacunas óbvias da lei.";
         break;
     case 'medium':
-        difficultyInstruction = "Nível MÉDIO: Aplicação direta em casos simples ou distinção entre conceitos próximos da lei.";
+        difficultyInstruction = "Gere APENAS questões de nível MÉDIO (medium). Crie pequenos casos práticos simples ou cobre distinções entre conceitos.";
         break;
     case 'hard':
-        difficultyInstruction = "Nível DIFÍCIL: Exceções, prazos específicos, combinações de parágrafos e 'pegadinhas' clássicas de concursos.";
+        difficultyInstruction = "Gere APENAS questões de nível DIFÍCIL (hard). Foque em exceções, prazos específicos, combinações de parágrafos/incisos, ou 'pegadinhas' sutis da lei seca.";
         break;
     case 'mixed':
-        difficultyInstruction = "Mistura equilibrada de dificuldades (Fácil, Médio e Difícil).";
+        difficultyInstruction = "Gere uma mistura equilibrada: aprox. 30% fáceis, 40% médias e 30% difíceis.";
         break;
   }
 
   const prompt = `
-    Atue como um especialista em elaboração de questões para concursos jurídicos de alto nível (Magistratura, MP, Defensoria).
-    Gere ${quantity} flashcards focados EXCLUSIVAMENTE na "Lei Seca" (texto literal) brasileira.
+    Gere ${quantity} flashcards para estudo de concursos públicos.
+    Matéria Principal: "${subject}".
+    Assunto Específico: "${topic}".
     
-    Matéria: "${subject}"
-    Assunto: "${topic}"
-    Diretrizes: ${difficultyInstruction}
+    Diretrizes de Dificuldade:
+    ${difficultyInstruction}
     
-    REQUISITOS TÉCNICOS:
-    1. O "front" deve ser uma pergunta clara e desafiadora.
-    2. O "options" deve conter 4 alternativas plausíveis.
-    3. O "correctAnswer" deve ser a alternativa correta exata.
-    4. O "back" deve explicar POR QUE aquela é a resposta, citando a lógica da lei.
-    5. O "legalText" deve ser o ARTIGO COMPLETO da lei. Use markdown **negrito** para destacar a parte que responde à pergunta.
-    6. O "legalReference" deve seguir o padrão: "Art. X, Lei Y" (Ex: Art. 121, CP).
+    Requisitos OBRIGATÓRIOS:
+    1. Baseie-se estritamente na "Lei Seca" (texto literal da lei) ou Tratados Internacionais.
     
-    Responda APENAS em JSON seguindo o esquema fornecido.
+    2. DINÂMICA DE ESTILO (IMPORTANTE):
+       - Aprox. 80% das cartas devem ser perguntas objetivas convencionais ou situações hipotéticas.
+       - Aprox. 20% (1 a cada 5 cartas, de forma aleatória) deve ser do tipo "COMPLETE A LACUNA":
+         * No campo "front", cite o texto literal da lei, mas substitua uma palavra-chave, prazo, percentual ou termo técnico por "__________" (10 underlines).
+         * Exemplo: "Art. X: A casa é asilo __________ do indivíduo..."
+         * A resposta correta deve ser o termo faltante.
+         * As opções erradas devem ser termos que causam confusão comum.
+
+    3. Gere 4 opções de resposta curtas no campo "options".
+    4. Indique a resposta correta no campo "correctAnswer".
+    5. O campo "back" (verso) deve conter a explicação clara e sucinta.
+    6. O campo "legalText" deve conter a cópia literal do artigo de lei completo. Use markdown (**negrito**) para grifar a resposta/termo que estava oculto.
+    7. O campo "difficulty" deve ser preenchido com 'easy', 'medium' ou 'hard' para cada carta.
+    8. O campo "legalReference" deve citar o artigo e a lei.
+    9. Use a ferramenta de busca para garantir legislação atualizada.
   `;
 
   try {
@@ -75,13 +84,13 @@ export const generateLegalFlashcards = async (
           items: {
             type: Type.OBJECT,
             properties: {
-              front: { type: Type.STRING },
-              options: { type: Type.ARRAY, items: { type: Type.STRING } },
-              correctAnswer: { type: Type.STRING },
-              back: { type: Type.STRING },
-              legalText: { type: Type.STRING },
-              legalReference: { type: Type.STRING },
-              difficulty: { type: Type.STRING, enum: ["easy", "medium", "hard"] }
+              front: { type: Type.STRING, description: "A pergunta ou o texto da lei com a lacuna '__________'." },
+              options: { type: Type.ARRAY, items: { type: Type.STRING }, description: "4 alternativas." },
+              correctAnswer: { type: Type.STRING, description: "Alternativa correta (o termo que preenche a lacuna)." },
+              back: { type: Type.STRING, description: "Explicação." },
+              legalText: { type: Type.STRING, description: "Texto de lei completo com grifos markdown." },
+              legalReference: { type: Type.STRING, description: "Ref. legal (Art. X)." },
+              difficulty: { type: Type.STRING, enum: ["easy", "medium", "hard"], description: "Nível da questão." }
             },
             required: ["front", "back", "legalText", "legalReference", "options", "correctAnswer", "difficulty"],
           },
@@ -90,11 +99,13 @@ export const generateLegalFlashcards = async (
     });
 
     if (response.text) {
-      return JSON.parse(response.text) as GeneratedCardData[];
+      const data = JSON.parse(response.text) as GeneratedCardData[];
+      return data;
     }
+    
     return [];
   } catch (error) {
-    console.error("Erro na geração Gemini:", error);
+    console.error("Error generating flashcards:", error);
     throw error;
   }
 };
