@@ -28,33 +28,36 @@ export const generateLegalFlashcards = async (
   let difficultyInstruction = "";
   switch (difficultyMode) {
     case 'easy':
-        difficultyInstruction = "Nível FÁCIL: Literalidade direta, conceitos básicos e preenchimento de lacunas óbvias.";
+        difficultyInstruction = "Nível BÁSICO (Padrão Banca Examinadora): Foco na literalidade da lei, mas cobrando prazos, quóruns e palavras-chave que confundem (ex: 'poderá' vs 'deverá', 'salvo' vs 'inclusive'). NÃO crie perguntas óbvias ou ingênuas.";
         break;
     case 'medium':
-        difficultyInstruction = "Nível MÉDIO: Casos práticos simples ou distinções entre conceitos semelhantes.";
+        difficultyInstruction = "Nível INTERMEDIÁRIO: Situações hipotéticas (casos práticos) que exigem a aplicação da lei (subsunção). Exige distinção clara entre conceitos semelhantes.";
         break;
     case 'hard':
-        difficultyInstruction = "Nível DIFÍCIL: Exceções, prazos específicos, pegadinhas e combinações de parágrafos.";
+        difficultyInstruction = "Nível AVANÇADO: Cobrança de exceções das exceções, parágrafos pouco lidos, competências exclusivas vs privativas, e detalhes minuciosos. Estilo 'pegadinha' de alto nível.";
         break;
     case 'mixed':
-        difficultyInstruction = "Mistura: 30% fáceis, 40% médias, 30% difíceis.";
+        difficultyInstruction = "Mistura equilibrada: 30% literais com pegadinhas (básico), 40% casos práticos (médio), 30% detalhes obscuros e exceções (avançado).";
         break;
   }
 
   const prompt = `
-    Gere ${quantity} flashcards de "Lei Seca" para concursos.
+    Atue como um EXAMINADOR RIGOROSO de concursos públicos de alto nível (Juiz, Promotor, Defensor).
+    Gere ${quantity} flashcards focados EXCLUSIVAMENTE na "Lei Seca" (texto legal).
+    
     Matéria: "${subject}".
     Tópico: "${topic}".
     
-    Dificuldade: ${difficultyInstruction}
+    Diretriz de Dificuldade: ${difficultyInstruction}
     
-    REGRAS:
-    1. Baseie-se apenas no texto literal da lei ou tratados.
-    2. 20% das cartas devem ser "COMPLETE A LACUNA" usando "__________".
-    3. Gere 4 opções de resposta.
-    4. Indique a resposta correta.
-    5. No verso (back), dê uma explicação curta.
-    6. No campo "legalText", coloque o artigo literal com a resposta em **negrito**.
+    REGRAS RÍGIDAS DE CRIAÇÃO:
+    1. Baseie-se apenas no texto literal da lei ou tratados vigentes.
+    2. Crie distratores (alternativas erradas) PLAUSÍVEIS. O candidato deve ficar em dúvida. Não use alternativas absurdas.
+    3. Se usar "COMPLETE A LACUNA" (max 20%), oculte palavras determinantes para o sentido jurídico, nunca artigos ou preposições irrelevantes.
+    4. Gere 4 opções de resposta.
+    5. Indique a resposta correta.
+    6. No verso (back), explique de forma técnica o erro das outras ou a lógica da correta.
+    7. No campo "legalText", coloque o artigo literal com a resposta em **negrito**.
   `;
 
   try {
