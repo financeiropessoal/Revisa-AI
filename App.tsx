@@ -7,7 +7,7 @@ import { StudyMode } from './components/StudyMode';
 import { StatsDashboard } from './components/StatsDashboard';
 import { GeneratorModal } from './components/GeneratorModal';
 import { GeneratedCardData } from './services/geminiService';
-import { GraduationCap, LayoutDashboard } from 'lucide-react';
+import { GraduationCap, LayoutDashboard, Moon, Sun } from 'lucide-react';
 
 const App: React.FC = () => {
   const [decks, setDecks] = useState<Deck[]>([]);
@@ -17,6 +17,29 @@ const App: React.FC = () => {
   const [generatorMode, setGeneratorMode] = useState<'NEW_DECK' | 'ADD_TO_DECK'>('NEW_DECK');
   const [tempDeck, setTempDeck] = useState<Deck | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
+  
+  // Theme State
+  const [theme, setTheme] = useState<'light' | 'dark'>(() => {
+    if (typeof window !== 'undefined') {
+      return (localStorage.getItem('theme') as 'light' | 'dark') || 'light';
+    }
+    return 'light';
+  });
+
+  // Apply Theme
+  useEffect(() => {
+    const root = window.document.documentElement;
+    if (theme === 'dark') {
+      root.classList.add('dark');
+    } else {
+      root.classList.remove('dark');
+    }
+    localStorage.setItem('theme', theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme(prev => prev === 'light' ? 'dark' : 'light');
+  };
 
   // 1. Carregamento inicial (apenas uma vez)
   useEffect(() => {
@@ -192,19 +215,27 @@ const App: React.FC = () => {
   const studyDeck = view === ViewState.STUDY_MODE ? getStudyDeck() : null;
 
   return (
-    <div className="flex flex-col h-full bg-slate-50">
-      <header className="bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between shrink-0 z-10 shadow-sm relative">
+    <div className="flex flex-col h-full bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors duration-300">
+      <header className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-6 py-4 flex items-center justify-between shrink-0 z-10 shadow-sm relative transition-colors duration-300">
         <div className="flex items-center gap-3 cursor-pointer" onClick={() => { setView(ViewState.DASHBOARD); setSelectedDeckId(null); setTempDeck(null); }}>
           <div className="bg-primary text-white p-2 rounded-lg shadow-sm">
             <GraduationCap size={24} />
           </div>
           <div>
-            <h1 className="text-xl font-bold text-slate-900 leading-tight">RevisAI</h1>
-            <p className="text-xs text-slate-500 font-medium tracking-wide">FLASHCARDS COM BASE NA LEI SECA</p>
+            <h1 className="text-xl font-bold text-slate-900 dark:text-white leading-tight">RevisAI</h1>
+            <p className="text-xs text-slate-500 dark:text-slate-400 font-medium tracking-wide">FLASHCARDS COM BASE NA LEI SECA</p>
           </div>
         </div>
         
         <div className="flex items-center gap-4">
+            <button
+              onClick={toggleTheme}
+              className="p-2 rounded-full text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+              title={theme === 'light' ? 'Mudar para modo escuro' : 'Mudar para modo claro'}
+            >
+              {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
+            </button>
+
              {view !== ViewState.STATS && (
                 <button 
                     onClick={() => setView(ViewState.STATS)}
@@ -214,8 +245,8 @@ const App: React.FC = () => {
                     <span className="hidden sm:inline">Estatísticas</span>
                 </button>
              )}
-            <div className="text-xs text-slate-400 font-mono hidden sm:block">
-            v1.9 • Gemini 3 Flash
+            <div className="text-xs text-slate-400 dark:text-slate-500 font-mono hidden sm:block">
+            v2.0 • Gemini 3
             </div>
         </div>
       </header>

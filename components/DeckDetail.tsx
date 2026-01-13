@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Deck, Flashcard, DifficultyLevel } from '../types';
 import { ArrowLeft, Play, Plus, Trash, Wand2, BookOpen, Scale, ListChecks, Pencil, AlertTriangle, Save } from 'lucide-react';
@@ -21,7 +20,7 @@ const RenderText: React.FC<{ text: string, className?: string }> = ({ text, clas
     <p className={className}>
       {parts.map((part, i) => {
         if (part.startsWith('**') && part.endsWith('**')) {
-          return <strong key={i} className="font-bold bg-yellow-100 text-slate-900 px-0.5 rounded">{part.slice(2, -2)}</strong>;
+          return <strong key={i} className="font-bold bg-yellow-100 dark:bg-yellow-900/50 text-slate-900 dark:text-yellow-100 px-0.5 rounded">{part.slice(2, -2)}</strong>;
         }
         return <span key={i}>{part}</span>;
       })}
@@ -32,9 +31,9 @@ const RenderText: React.FC<{ text: string, className?: string }> = ({ text, clas
 const DifficultyBadge: React.FC<{ level?: DifficultyLevel }> = ({ level }) => {
     if (!level) return null;
     const styles = {
-        easy: "bg-green-100 text-green-700 border-green-200",
-        medium: "bg-yellow-100 text-yellow-700 border-yellow-200",
-        hard: "bg-red-100 text-red-700 border-red-200"
+        easy: "bg-green-100 text-green-700 border-green-200 dark:bg-green-900/30 dark:text-green-400 dark:border-green-800",
+        medium: "bg-yellow-100 text-yellow-700 border-yellow-200 dark:bg-yellow-900/30 dark:text-yellow-400 dark:border-yellow-800",
+        hard: "bg-red-100 text-red-700 border-red-200 dark:bg-red-900/30 dark:text-red-400 dark:border-red-800"
     };
     const labels = {
         easy: "Fácil",
@@ -138,28 +137,28 @@ export const DeckDetail: React.FC<DeckDetailProps> = ({
       {/* Header */}
       <div className="mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center gap-4">
-          <button onClick={onBack} className="p-2 hover:bg-slate-100 rounded-full transition-colors">
-            <ArrowLeft size={24} className="text-slate-600" />
+          <button onClick={onBack} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors">
+            <ArrowLeft size={24} className="text-slate-600 dark:text-slate-300" />
           </button>
           <div>
-            <div className="flex items-center gap-2 text-sm text-slate-500 mb-1">
-                <span className="bg-slate-100 px-2 py-0.5 rounded text-xs uppercase tracking-wider font-semibold">{deck.subject || "Geral"}</span>
+            <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400 mb-1">
+                <span className="bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded text-xs uppercase tracking-wider font-semibold">{deck.subject || "Geral"}</span>
             </div>
-            <h2 className="text-2xl font-bold text-slate-800">{deck.title}</h2>
-            <p className="text-slate-500 text-sm">{deck.cards.length} cartas</p>
+            <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100">{deck.title}</h2>
+            <p className="text-slate-500 dark:text-slate-400 text-sm">{deck.cards.length} cartas</p>
           </div>
         </div>
         <div className="flex gap-2">
            <button
             onClick={onGenerateAI}
-            className="flex items-center gap-2 bg-indigo-100 text-indigo-700 hover:bg-indigo-200 px-4 py-2 rounded-lg font-medium transition-colors"
+            className="flex items-center gap-2 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-200 dark:hover:bg-indigo-900/50 px-4 py-2 rounded-lg font-medium transition-colors"
           >
             <Wand2 size={18} />
             <span className="hidden sm:inline">Gerar com IA</span>
           </button>
           <button
             onClick={handleAddNewClick}
-            className="flex items-center gap-2 bg-slate-100 text-slate-700 hover:bg-slate-200 px-4 py-2 rounded-lg font-medium transition-colors"
+            className="flex items-center gap-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 px-4 py-2 rounded-lg font-medium transition-colors"
           >
             <Plus size={18} />
             <span className="hidden sm:inline">Adicionar</span>
@@ -169,7 +168,7 @@ export const DeckDetail: React.FC<DeckDetailProps> = ({
             disabled={deck.cards.length === 0}
             className={`flex items-center gap-2 px-6 py-2 rounded-lg font-bold shadow transition-colors ${
               deck.cards.length === 0
-                ? 'bg-slate-300 text-slate-500 cursor-not-allowed'
+                ? 'bg-slate-300 dark:bg-slate-700 text-slate-500 dark:text-slate-400 cursor-not-allowed'
                 : 'bg-primary hover:bg-secondary text-white'
             }`}
           >
@@ -181,50 +180,50 @@ export const DeckDetail: React.FC<DeckDetailProps> = ({
 
       {/* Add/Edit Form */}
       {showForm && (
-        <div className="mb-6 bg-white p-6 rounded-xl shadow border border-slate-200 animate-in fade-in slide-in-from-top-4 border-l-4 border-l-primary">
-          <h3 className="font-bold text-slate-800 mb-4 flex items-center gap-2">
+        <div className="mb-6 bg-white dark:bg-slate-800 p-6 rounded-xl shadow border border-slate-200 dark:border-slate-700 animate-in fade-in slide-in-from-top-4 border-l-4 border-l-primary">
+          <h3 className="font-bold text-slate-800 dark:text-slate-100 mb-4 flex items-center gap-2">
             {editingCardId ? <Pencil size={18} /> : <Plus size={18} />} 
             {editingCardId ? 'Editar Flashcard' : 'Nova Carta Manual'}
           </h3>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Pergunta (Frente)</label>
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Pergunta (Frente)</label>
               <input
                 type="text"
                 value={front}
                 onChange={(e) => setFront(e.target.value)}
-                className="w-full p-2 bg-white text-slate-900 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none placeholder:text-slate-400"
+                className="w-full p-2 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none placeholder:text-slate-400 dark:placeholder:text-slate-500"
                 placeholder="Ex: Qual a pena para o crime de furto simples?"
                 required
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Explicação (Verso)</label>
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Explicação (Verso)</label>
               <textarea
                 value={back}
                 onChange={(e) => setBack(e.target.value)}
-                className="w-full p-2 bg-white text-slate-900 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none h-20 placeholder:text-slate-400"
+                className="w-full p-2 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none h-20 placeholder:text-slate-400 dark:placeholder:text-slate-500"
                 placeholder="Ex: É a subtração de coisa alheia móvel..."
                 required
               />
             </div>
              <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">Referência Legal</label>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Referência Legal</label>
                   <input
                     type="text"
                     value={ref}
                     onChange={(e) => setRef(e.target.value)}
-                    className="w-full p-2 bg-white text-slate-900 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none placeholder:text-slate-400"
+                    className="w-full p-2 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none placeholder:text-slate-400 dark:placeholder:text-slate-500"
                     placeholder="Ex: Art. 155, CP"
                   />
                 </div>
                 <div>
-                   <label className="block text-sm font-medium text-slate-700 mb-1">Dificuldade</label>
+                   <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Dificuldade</label>
                    <select 
                         value={difficulty} 
                         onChange={(e) => setDifficulty(e.target.value as DifficultyLevel)}
-                        className="w-full p-2 bg-white text-slate-900 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none"
+                        className="w-full p-2 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none"
                    >
                        <option value="easy">Fácil</option>
                        <option value="medium">Médio</option>
@@ -233,11 +232,11 @@ export const DeckDetail: React.FC<DeckDetailProps> = ({
                 </div>
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Texto de Lei (Literal)</label>
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Texto de Lei (Literal)</label>
               <textarea
                 value={legalText}
                 onChange={(e) => setLegalText(e.target.value)}
-                className="w-full p-2 bg-white text-slate-900 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none h-20 font-serif placeholder:text-slate-400"
+                className="w-full p-2 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none h-20 font-serif placeholder:text-slate-400 dark:placeholder:text-slate-500"
                 placeholder="Cole o artigo da lei aqui. Use **texto** para grifar."
               />
             </div>
@@ -246,7 +245,7 @@ export const DeckDetail: React.FC<DeckDetailProps> = ({
               <button
                 type="button"
                 onClick={() => setShowForm(false)}
-                className="px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-lg"
+                className="px-4 py-2 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg"
               >
                 Cancelar
               </button>
@@ -263,8 +262,8 @@ export const DeckDetail: React.FC<DeckDetailProps> = ({
       )}
 
       {/* Warning Disclaimer */}
-      <div className="mb-4 bg-amber-50 border border-amber-200 rounded-lg p-3 flex items-start gap-3 text-sm text-amber-900">
-        <AlertTriangle size={18} className="shrink-0 mt-0.5 text-amber-600" />
+      <div className="mb-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-900/50 rounded-lg p-3 flex items-start gap-3 text-sm text-amber-900 dark:text-amber-200">
+        <AlertTriangle size={18} className="shrink-0 mt-0.5 text-amber-600 dark:text-amber-500" />
         <p>
           <strong>Atenção:</strong> O conteúdo é gerado com base <strong>EXCLUSIVAMENTE EM FLASHCARDS COM BASE NA LEI SECA</strong>. Entendimentos jurisprudenciais (STF/STJ) ou doutrinários <strong>NÃO</strong> estão incluídos. Podem ocorrer imprecisões da IA; sempre confira o texto oficial vigente.
         </p>
@@ -273,7 +272,7 @@ export const DeckDetail: React.FC<DeckDetailProps> = ({
       {/* Cards List */}
       <div className="flex-1 overflow-y-auto pr-2">
         {deck.cards.length === 0 ? (
-          <div className="text-center py-16 text-slate-400">
+          <div className="text-center py-16 text-slate-400 dark:text-slate-600">
             <BookOpen size={48} className="mx-auto mb-4 opacity-50" />
             <p className="text-lg">Este baralho está vazio.</p>
             <p className="text-sm">Use a IA para gerar questões ou adicione manualmente.</p>
@@ -281,15 +280,15 @@ export const DeckDetail: React.FC<DeckDetailProps> = ({
         ) : (
           <div className="space-y-4 pb-10">
             {deck.cards.map((card) => (
-              <div key={card.id} className={`bg-white p-5 rounded-lg border hover:border-blue-300 transition-colors flex justify-between gap-4 group shadow-sm ${card.studied ? 'border-green-200 bg-green-50/30' : 'border-slate-200'}`}>
+              <div key={card.id} className={`bg-white dark:bg-slate-800 p-5 rounded-lg border hover:border-blue-300 dark:hover:border-blue-700 transition-colors flex justify-between gap-4 group shadow-sm ${card.studied ? 'border-green-200 dark:border-green-900/50 bg-green-50/30 dark:bg-green-900/10' : 'border-slate-200 dark:border-slate-700'}`}>
                 <div className="flex-1 space-y-3">
                   {/* Front */}
                   <div className="flex items-start gap-2 relative">
-                     <span className="font-bold text-slate-800 text-sm mt-0.5 min-w-[20px]">P:</span>
-                     <span className="text-slate-800 font-medium pr-16">{card.front}</span>
+                     <span className="font-bold text-slate-800 dark:text-slate-300 text-sm mt-0.5 min-w-[20px]">P:</span>
+                     <span className="text-slate-800 dark:text-slate-200 font-medium pr-16">{card.front}</span>
                      
                      <div className="absolute right-0 top-0 flex flex-col gap-1 items-end">
-                         {card.studied && <span className="text-[10px] bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-bold">Estudado</span>}
+                         {card.studied && <span className="text-[10px] bg-green-100 dark:bg-green-900/50 text-green-700 dark:text-green-300 px-2 py-0.5 rounded-full font-bold">Estudado</span>}
                          <DifficultyBadge level={card.difficulty} />
                      </div>
                   </div>
@@ -297,7 +296,7 @@ export const DeckDetail: React.FC<DeckDetailProps> = ({
                   {/* Options Indicator (if present) */}
                   {card.options && card.options.length > 0 && (
                      <div className="ml-7 mb-1">
-                         <span className="inline-flex items-center gap-1 text-xs text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full">
+                         <span className="inline-flex items-center gap-1 text-xs text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-700 px-2 py-0.5 rounded-full">
                             <ListChecks size={12} />
                             Questão com alternativas
                          </span>
@@ -306,14 +305,14 @@ export const DeckDetail: React.FC<DeckDetailProps> = ({
                   
                   {/* Back */}
                    <div className="flex items-start gap-2">
-                     <span className="font-bold text-slate-500 text-sm mt-0.5 min-w-[20px]">R:</span>
-                     <p className="text-slate-600 text-sm">{card.back}</p>
+                     <span className="font-bold text-slate-500 dark:text-slate-400 text-sm mt-0.5 min-w-[20px]">R:</span>
+                     <p className="text-slate-600 dark:text-slate-300 text-sm">{card.back}</p>
                   </div>
                   
                   {/* Legal Text */}
                   {card.legalText && (
-                    <div className="ml-7 p-3 bg-slate-50 border-l-2 border-primary rounded-r text-sm text-slate-700 font-serif italic">
-                         <div className="flex items-center gap-1 mb-1 text-slate-400 text-xs not-italic font-sans">
+                    <div className="ml-7 p-3 bg-slate-50 dark:bg-slate-900/50 border-l-2 border-primary rounded-r text-sm text-slate-700 dark:text-slate-300 font-serif italic">
+                         <div className="flex items-center gap-1 mb-1 text-slate-400 dark:text-slate-500 text-xs not-italic font-sans">
                             <Scale size={12} />
                             <span>Texto da Lei:</span>
                          </div>
@@ -324,7 +323,7 @@ export const DeckDetail: React.FC<DeckDetailProps> = ({
                   {/* Reference */}
                   {card.legalReference && (
                     <div className="ml-7">
-                        <span className="text-xs text-blue-600 font-mono bg-blue-50 px-1.5 py-0.5 rounded">
+                        <span className="text-xs text-blue-600 dark:text-blue-400 font-mono bg-blue-50 dark:bg-blue-900/30 px-1.5 py-0.5 rounded">
                         {card.legalReference}
                         </span>
                     </div>
@@ -335,14 +334,14 @@ export const DeckDetail: React.FC<DeckDetailProps> = ({
                 <div className="flex flex-col gap-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
                     <button
                         onClick={(e) => handleEditClick(e, card)}
-                        className="text-slate-400 hover:text-blue-600 p-1 hover:bg-blue-50 rounded"
+                        className="text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 p-1 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded"
                         title="Editar carta"
                     >
                         <Pencil size={18} />
                     </button>
                     <button
                         onClick={(e) => handleDeleteClick(e, card.id)}
-                        className="text-slate-400 hover:text-red-500 p-1 hover:bg-red-50 rounded"
+                        className="text-slate-400 hover:text-red-500 dark:hover:text-red-400 p-1 hover:bg-red-50 dark:hover:bg-red-900/30 rounded"
                         title="Excluir carta"
                     >
                         <Trash size={18} />

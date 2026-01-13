@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { X, Sparkles, AlertCircle, Loader2, AlertTriangle, Signal } from 'lucide-react';
 import { generateLegalFlashcards, GeneratedCardData } from '../services/geminiService';
@@ -45,13 +44,13 @@ export const GeneratorModal: React.FC<GeneratorModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-      <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 animate-in fade-in zoom-in-95 duration-200 overflow-y-auto max-h-[90vh]">
+      <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl max-w-md w-full p-6 animate-in fade-in zoom-in-95 duration-200 overflow-y-auto max-h-[90vh]">
         <div className="flex justify-between items-start mb-6">
-          <div className="flex items-center gap-2 text-primary">
+          <div className="flex items-center gap-2 text-primary dark:text-blue-400">
             <Sparkles size={24} />
-            <h2 className="text-xl font-bold text-slate-900">Gerador de Baralhos</h2>
+            <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100">Gerador de Baralhos</h2>
           </div>
-          <button onClick={onClose} className="text-slate-400 hover:text-slate-600" disabled={loading}>
+          <button onClick={onClose} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200" disabled={loading}>
             <X size={24} />
           </button>
         </div>
@@ -59,7 +58,7 @@ export const GeneratorModal: React.FC<GeneratorModalProps> = ({
         <form onSubmit={handleGenerate}>
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
                 Matéria Principal
               </label>
               <input
@@ -67,14 +66,14 @@ export const GeneratorModal: React.FC<GeneratorModalProps> = ({
                 value={subject}
                 onChange={(e) => setSubject(e.target.value)}
                 disabled={loading || (!isNewDeck && !!initialSubject)}
-                className="w-full p-3 bg-white text-slate-900 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none disabled:bg-slate-100 disabled:text-slate-500 placeholder:text-slate-400"
+                className="w-full p-3 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none disabled:bg-slate-100 dark:disabled:bg-slate-700 disabled:text-slate-500 placeholder:text-slate-400 dark:placeholder:text-slate-500"
                 placeholder="Ex: Direito Penal"
                 required
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
                 Assunto Específico
               </label>
               <input
@@ -82,43 +81,43 @@ export const GeneratorModal: React.FC<GeneratorModalProps> = ({
                 value={topic}
                 onChange={(e) => setTopic(e.target.value)}
                 disabled={loading}
-                className="w-full p-3 bg-white text-slate-900 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none placeholder:text-slate-400"
+                className="w-full p-3 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none placeholder:text-slate-400 dark:placeholder:text-slate-500"
                 placeholder="Ex: Crimes contra a Vida"
                 required
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1 flex items-center gap-2">
-                <Signal size={16} className="text-slate-500" />
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1 flex items-center gap-2">
+                <Signal size={16} className="text-slate-500 dark:text-slate-400" />
                 Nível de Dificuldade
               </label>
               <div className="grid grid-cols-2 gap-2">
                  <button
                     type="button"
                     onClick={() => setDifficulty('easy')}
-                    className={`p-2 rounded-lg border text-sm font-medium transition-colors ${difficulty === 'easy' ? 'bg-green-100 border-green-400 text-green-800' : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'}`}
+                    className={`p-2 rounded-lg border text-sm font-medium transition-colors ${difficulty === 'easy' ? 'bg-green-100 border-green-400 text-green-800 dark:bg-green-900/30 dark:text-green-300 dark:border-green-800' : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700'}`}
                  >
                     Fácil
                  </button>
                  <button
                     type="button"
                     onClick={() => setDifficulty('medium')}
-                    className={`p-2 rounded-lg border text-sm font-medium transition-colors ${difficulty === 'medium' ? 'bg-yellow-100 border-yellow-400 text-yellow-800' : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'}`}
+                    className={`p-2 rounded-lg border text-sm font-medium transition-colors ${difficulty === 'medium' ? 'bg-yellow-100 border-yellow-400 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300 dark:border-yellow-800' : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700'}`}
                  >
                     Médio
                  </button>
                  <button
                     type="button"
                     onClick={() => setDifficulty('hard')}
-                    className={`p-2 rounded-lg border text-sm font-medium transition-colors ${difficulty === 'hard' ? 'bg-red-100 border-red-400 text-red-800' : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'}`}
+                    className={`p-2 rounded-lg border text-sm font-medium transition-colors ${difficulty === 'hard' ? 'bg-red-100 border-red-400 text-red-800 dark:bg-red-900/30 dark:text-red-300 dark:border-red-800' : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700'}`}
                  >
                     Difícil
                  </button>
                  <button
                     type="button"
                     onClick={() => setDifficulty('mixed')}
-                    className={`p-2 rounded-lg border text-sm font-medium transition-colors ${difficulty === 'mixed' ? 'bg-indigo-100 border-indigo-400 text-indigo-800' : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'}`}
+                    className={`p-2 rounded-lg border text-sm font-medium transition-colors ${difficulty === 'mixed' ? 'bg-indigo-100 border-indigo-400 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-300 dark:border-indigo-800' : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700'}`}
                  >
                     Misto (Todas)
                  </button>
@@ -126,7 +125,7 @@ export const GeneratorModal: React.FC<GeneratorModalProps> = ({
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
                 Quantidade de Flashcards
               </label>
               <input
@@ -136,23 +135,23 @@ export const GeneratorModal: React.FC<GeneratorModalProps> = ({
                 value={quantity}
                 onChange={(e) => setQuantity(Number(e.target.value))}
                 disabled={loading}
-                className="w-full accent-primary h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer"
+                className="w-full accent-primary dark:accent-blue-500 h-2 bg-slate-200 dark:bg-slate-600 rounded-lg appearance-none cursor-pointer"
               />
-              <div className="flex justify-between text-xs text-slate-500 mt-1">
+              <div className="flex justify-between text-xs text-slate-500 dark:text-slate-400 mt-1">
                 <span>3</span>
-                <span className="font-bold text-primary text-base">{quantity}</span>
+                <span className="font-bold text-primary dark:text-blue-400 text-base">{quantity}</span>
                 <span>30</span>
               </div>
             </div>
           </div>
 
-          <div className="mt-4 p-3 bg-amber-50 text-amber-800 text-xs rounded-lg flex items-start gap-2 border border-amber-100">
-             <AlertTriangle size={16} className="shrink-0 mt-0.5 text-amber-600" />
+          <div className="mt-4 p-3 bg-amber-50 dark:bg-amber-900/20 text-amber-800 dark:text-amber-200 text-xs rounded-lg flex items-start gap-2 border border-amber-100 dark:border-amber-900/50">
+             <AlertTriangle size={16} className="shrink-0 mt-0.5 text-amber-600 dark:text-amber-500" />
              <p>A IA utiliza <strong>EXCLUSIVAMENTE FLASHCARDS COM BASE NA LEI SECA</strong>. Jurisprudência não incluída. As questões médias/difíceis focam em casos práticos e exceções.</p>
           </div>
 
           {error && (
-            <div className="mt-4 p-3 bg-red-50 text-red-700 text-sm rounded-lg flex items-start gap-2">
+            <div className="mt-4 p-3 bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-300 text-sm rounded-lg flex items-start gap-2">
               <AlertCircle size={16} className="mt-0.5 shrink-0" />
               <span>{error}</span>
             </div>
@@ -163,7 +162,7 @@ export const GeneratorModal: React.FC<GeneratorModalProps> = ({
               type="submit"
               disabled={loading}
               className={`w-full py-3 px-4 rounded-xl text-white font-bold shadow-lg transition-all flex items-center justify-center gap-2 ${
-                loading ? 'bg-indigo-300 cursor-not-allowed' : 'bg-gradient-to-r from-primary to-secondary hover:shadow-xl hover:scale-[1.02]'
+                loading ? 'bg-indigo-300 dark:bg-indigo-800 cursor-not-allowed' : 'bg-gradient-to-r from-primary to-secondary dark:from-blue-700 dark:to-blue-600 hover:shadow-xl hover:scale-[1.02]'
               }`}
             >
               {loading ? (

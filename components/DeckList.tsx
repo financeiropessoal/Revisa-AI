@@ -38,13 +38,13 @@ export const DeckList: React.FC<DeckListProps> = ({ decks, onSelectDeck, onDelet
         <div className="flex items-center gap-4 mb-8">
             <button 
                 onClick={() => setSelectedSubject(null)}
-                className="p-2 hover:bg-slate-200 rounded-full transition-colors"
+                className="p-2 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-full transition-colors"
             >
-                <ArrowLeft size={24} className="text-slate-600" />
+                <ArrowLeft size={24} className="text-slate-600 dark:text-slate-300" />
             </button>
             <div>
-                <h2 className="text-3xl font-bold text-slate-800">{selectedSubject}</h2>
-                <p className="text-slate-500 mt-1">Selecione um assunto para estudar</p>
+                <h2 className="text-3xl font-bold text-slate-800 dark:text-slate-100">{selectedSubject}</h2>
+                <p className="text-slate-500 dark:text-slate-400 mt-1">Selecione um assunto para estudar</p>
             </div>
         </div>
 
@@ -55,7 +55,7 @@ export const DeckList: React.FC<DeckListProps> = ({ decks, onSelectDeck, onDelet
             return (
               <div
                 key={deck.id}
-                className="bg-white rounded-xl shadow-sm border border-slate-200 hover:shadow-md transition-shadow p-5 flex flex-col justify-between group cursor-pointer relative"
+                className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 hover:shadow-md transition-shadow p-5 flex flex-col justify-between group cursor-pointer relative"
                 onClick={() => onSelectDeck(deck)}
               >
                 {/* Delete Button - Positioned Absolute for better click handling */}
@@ -64,7 +64,7 @@ export const DeckList: React.FC<DeckListProps> = ({ decks, onSelectDeck, onDelet
                       e.stopPropagation(); 
                       onDeleteDeck(deck.id); 
                     }}
-                    className="absolute top-4 right-4 text-slate-300 hover:text-red-500 hover:bg-red-50 p-2 rounded-full transition-all z-20"
+                    className="absolute top-4 right-4 text-slate-300 dark:text-slate-600 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 p-2 rounded-full transition-all z-20"
                     title="Excluir este baralho"
                 >
                     <Trash2 size={20} />
@@ -72,20 +72,20 @@ export const DeckList: React.FC<DeckListProps> = ({ decks, onSelectDeck, onDelet
 
                 <div>
                   <div className="flex justify-between items-start">
-                      <div className="bg-blue-50 text-blue-700 p-2 rounded-lg mb-4 inline-block">
+                      <div className="bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 p-2 rounded-lg mb-4 inline-block">
                           <Book size={24} />
                       </div>
                   </div>
-                  <h3 className="text-xl font-bold text-slate-800 mb-2 pr-8">{deck.title}</h3>
-                  <p className="text-slate-500 text-sm line-clamp-2 mb-4">{deck.description}</p>
+                  <h3 className="text-xl font-bold text-slate-800 dark:text-slate-100 mb-2 pr-8">{deck.title}</h3>
+                  <p className="text-slate-500 dark:text-slate-400 text-sm line-clamp-2 mb-4">{deck.description}</p>
                 </div>
                 
                 <div className="mt-auto">
-                    <div className="flex items-center justify-between pt-3 border-t border-slate-100">
-                        <span className="text-sm font-medium text-slate-600">
+                    <div className="flex items-center justify-between pt-3 border-t border-slate-100 dark:border-slate-700">
+                        <span className="text-sm font-medium text-slate-600 dark:text-slate-400">
                         {totalCount} {totalCount === 1 ? 'carta' : 'cartas'}
                         </span>
-                        <span className="text-primary group-hover:translate-x-1 transition-transform">
+                        <span className="text-primary dark:text-blue-400 group-hover:translate-x-1 transition-transform">
                         <ChevronRight size={20} />
                         </span>
                     </div>
@@ -97,7 +97,7 @@ export const DeckList: React.FC<DeckListProps> = ({ decks, onSelectDeck, onDelet
            {/* Quick Add Button inside Subject */}
            <button
             onClick={onCreateNew}
-            className="border-2 border-dashed border-slate-300 rounded-xl p-5 flex flex-col items-center justify-center text-slate-400 hover:border-primary hover:text-primary hover:bg-blue-50 transition-all cursor-pointer h-full min-h-[200px]"
+            className="border-2 border-dashed border-slate-300 dark:border-slate-600 rounded-xl p-5 flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 hover:border-primary dark:hover:border-blue-400 hover:text-primary dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-slate-800/50 transition-all cursor-pointer h-full min-h-[200px]"
           >
             <Plus size={32} className="mb-2" />
             <span className="font-medium">Adicionar Assunto</span>
@@ -112,8 +112,8 @@ export const DeckList: React.FC<DeckListProps> = ({ decks, onSelectDeck, onDelet
     <div className="p-6 max-w-5xl mx-auto w-full">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
         <div>
-            <h2 className="text-3xl font-bold text-slate-800">Minhas Matérias</h2>
-            <p className="text-slate-500 mt-1">Organize seus estudos por disciplina jurídica</p>
+            <h2 className="text-3xl font-bold text-slate-800 dark:text-slate-100">Minhas Matérias</h2>
+            <p className="text-slate-500 dark:text-slate-400 mt-1">Organize seus estudos por disciplina jurídica</p>
         </div>
         <div className="flex gap-3">
             {totalCardsAcrossAllDecks > 0 && (
@@ -128,7 +128,7 @@ export const DeckList: React.FC<DeckListProps> = ({ decks, onSelectDeck, onDelet
             )}
             <button
             onClick={onCreateNew}
-            className="flex items-center gap-2 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 px-4 py-2 rounded-lg shadow-sm transition-colors"
+            className="flex items-center gap-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 px-4 py-2 rounded-lg shadow-sm transition-colors"
             >
             <Plus size={20} />
             <span>Novo Baralho</span>
@@ -137,13 +137,13 @@ export const DeckList: React.FC<DeckListProps> = ({ decks, onSelectDeck, onDelet
       </div>
 
       {subjects.length === 0 ? (
-        <div className="text-center py-20 bg-white rounded-xl shadow-sm border border-slate-200">
-          <FolderOpen size={48} className="mx-auto text-slate-300 mb-4" />
-          <h3 className="text-xl font-medium text-slate-700">Nenhuma matéria encontrada</h3>
-          <p className="text-slate-500 mt-2">Comece criando seu primeiro baralho de estudos.</p>
+        <div className="text-center py-20 bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700">
+          <FolderOpen size={48} className="mx-auto text-slate-300 dark:text-slate-600 mb-4" />
+          <h3 className="text-xl font-medium text-slate-700 dark:text-slate-300">Nenhuma matéria encontrada</h3>
+          <p className="text-slate-500 dark:text-slate-400 mt-2">Comece criando seu primeiro baralho de estudos.</p>
           <button
             onClick={onCreateNew}
-            className="mt-6 text-primary font-medium hover:underline"
+            className="mt-6 text-primary dark:text-blue-400 font-medium hover:underline"
           >
             Criar agora
           </button>
@@ -158,7 +158,7 @@ export const DeckList: React.FC<DeckListProps> = ({ decks, onSelectDeck, onDelet
              return (
               <div
                 key={subject}
-                className="bg-white rounded-xl shadow-sm border border-slate-200 hover:shadow-md hover:border-blue-300 transition-all p-5 cursor-pointer flex flex-col items-center text-center gap-4 group relative overflow-hidden"
+                className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 hover:shadow-md hover:border-blue-300 dark:hover:border-blue-500 transition-all p-5 cursor-pointer flex flex-col items-center text-center gap-4 group relative overflow-hidden"
                 onClick={() => setSelectedSubject(subject)}
               >
                  <button 
@@ -166,18 +166,18 @@ export const DeckList: React.FC<DeckListProps> = ({ decks, onSelectDeck, onDelet
                       e.stopPropagation(); 
                       onDeleteSubject(subject); 
                     }}
-                    className="absolute top-2 right-2 p-2 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-full transition-all z-20 opacity-0 group-hover:opacity-100"
+                    className="absolute top-2 right-2 p-2 text-slate-300 dark:text-slate-600 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-full transition-all z-20 opacity-0 group-hover:opacity-100"
                     title={`Excluir toda a matéria: ${subject}`}
                 >
                     <Trash2 size={18} />
                 </button>
 
-                <div className="bg-amber-100 text-amber-600 p-4 rounded-full group-hover:scale-110 transition-transform">
+                <div className="bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-500 p-4 rounded-full group-hover:scale-110 transition-transform">
                   <Folder size={32} fill="currentColor" className="opacity-80" />
                 </div>
                 <div>
-                    <h3 className="text-lg font-bold text-slate-800">{subject}</h3>
-                    <p className="text-sm text-slate-500">{count} {count === 1 ? 'baralho' : 'baralhos'}</p>
+                    <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100">{subject}</h3>
+                    <p className="text-sm text-slate-500 dark:text-slate-400">{count} {count === 1 ? 'baralho' : 'baralhos'}</p>
                 </div>
               </div>
             );

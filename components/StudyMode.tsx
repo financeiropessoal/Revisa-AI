@@ -27,9 +27,9 @@ const RenderText: React.FC<{ text: string, className?: string }> = ({ text, clas
 const DifficultyBadge: React.FC<{ level?: DifficultyLevel }> = ({ level }) => {
     if (!level) return null;
     const styles = {
-        easy: "bg-green-100 text-green-700 border-green-200",
-        medium: "bg-yellow-100 text-yellow-700 border-yellow-200",
-        hard: "bg-red-100 text-red-700 border-red-200"
+        easy: "bg-green-100 text-green-700 border-green-200 dark:bg-green-900/30 dark:text-green-400 dark:border-green-800",
+        medium: "bg-yellow-100 text-yellow-700 border-yellow-200 dark:bg-yellow-900/30 dark:text-yellow-400 dark:border-yellow-800",
+        hard: "bg-red-100 text-red-700 border-red-200 dark:bg-red-900/30 dark:text-red-400 dark:border-red-800"
     };
     const labels = {
         easy: "Fácil",
@@ -175,24 +175,24 @@ export const StudyMode: React.FC<StudyModeProps> = ({ deck, onExit, onMarkStudie
   if (finished) {
     return (
       <div className="flex flex-col items-center justify-center h-full p-8 text-center max-w-2xl mx-auto">
-        <div className="bg-green-100 text-green-600 p-6 rounded-full mb-6">
+        <div className="bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 p-6 rounded-full mb-6">
             <CheckCircle size={64} />
         </div>
-        <h2 className="text-3xl font-bold text-slate-800 mb-4">Parabéns!</h2>
-        <p className="text-slate-600 mb-2 text-lg">
+        <h2 className="text-3xl font-bold text-slate-800 dark:text-slate-100 mb-4">Parabéns!</h2>
+        <p className="text-slate-600 dark:text-slate-300 mb-2 text-lg">
           Você revisou todas as {deck.cards.length} cartas de <strong>{deck.title}</strong>.
         </p>
-        <p className="text-sm text-slate-500 mb-6">
+        <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">
             O algoritmo de repetição espaçada agendou suas próximas revisões.
         </p>
-        <div className="flex items-center gap-2 justify-center text-slate-500 mb-8 font-mono bg-slate-100 py-1 px-3 rounded-full w-fit mx-auto">
+        <div className="flex items-center gap-2 justify-center text-slate-500 dark:text-slate-400 mb-8 font-mono bg-slate-100 dark:bg-slate-800 py-1 px-3 rounded-full w-fit mx-auto">
            <Clock size={16} />
            <span>Tempo total: {formatTime(timeElapsed)}</span>
         </div>
         <div className="flex gap-4">
           <button
             onClick={onExit}
-            className="px-6 py-3 bg-slate-200 hover:bg-slate-300 text-slate-800 rounded-lg font-medium transition-colors"
+            className="px-6 py-3 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-800 dark:text-slate-200 rounded-lg font-medium transition-colors"
           >
             Voltar ao Menu
           </button>
@@ -216,22 +216,22 @@ export const StudyMode: React.FC<StudyModeProps> = ({ deck, onExit, onMarkStudie
     <div className="flex flex-col h-full max-w-4xl mx-auto w-full p-4 relative">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
-        <button onClick={onExit} className="text-slate-500 hover:text-slate-800 transition-colors">
+        <button onClick={onExit} className="text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 transition-colors">
           <X size={24} />
         </button>
         <div className="flex items-center gap-4">
-            <div className="flex items-center gap-1.5 text-slate-500 font-mono text-sm bg-slate-100 pl-3 pr-1 py-1 rounded-full">
+            <div className="flex items-center gap-1.5 text-slate-500 dark:text-slate-400 font-mono text-sm bg-slate-100 dark:bg-slate-800 pl-3 pr-1 py-1 rounded-full">
                 <Clock size={14} />
                 <span className="min-w-[40px] text-center">{formatTime(timeElapsed)}</span>
                 <button 
                     onClick={togglePause}
-                    className="ml-1 p-1 hover:bg-slate-200 rounded-full text-slate-600 transition-colors"
+                    className="ml-1 p-1 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-full text-slate-600 dark:text-slate-300 transition-colors"
                     title={isPaused ? "Retomar" : "Pausar"}
                 >
                     {isPaused ? <Play size={14} fill="currentColor" /> : <Pause size={14} fill="currentColor" />}
                 </button>
             </div>
-            <div className="text-slate-500 font-medium font-mono">
+            <div className="text-slate-500 dark:text-slate-400 font-medium font-mono">
                 {currentIndex + 1} / {deck.cards.length}
             </div>
         </div>
@@ -239,12 +239,12 @@ export const StudyMode: React.FC<StudyModeProps> = ({ deck, onExit, onMarkStudie
 
       {/* PAUSE OVERLAY */}
       {isPaused && (
-        <div className="absolute inset-0 z-50 bg-white/90 backdrop-blur-sm flex flex-col items-center justify-center rounded-3xl animate-in fade-in duration-200">
-            <div className="bg-slate-100 p-6 rounded-full mb-6 text-slate-400">
+        <div className="absolute inset-0 z-50 bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm flex flex-col items-center justify-center rounded-3xl animate-in fade-in duration-200">
+            <div className="bg-slate-100 dark:bg-slate-800 p-6 rounded-full mb-6 text-slate-400 dark:text-slate-500">
                 <Pause size={48} fill="currentColor" />
             </div>
-            <h2 className="text-3xl font-bold text-slate-800 mb-2">Pausado</h2>
-            <p className="text-slate-500 mb-8">Seu tempo de estudo está parado.</p>
+            <h2 className="text-3xl font-bold text-slate-800 dark:text-slate-100 mb-2">Pausado</h2>
+            <p className="text-slate-500 dark:text-slate-400 mb-8">Seu tempo de estudo está parado.</p>
             <button 
                 onClick={() => setIsPaused(false)}
                 className="bg-primary hover:bg-secondary text-white px-8 py-3 rounded-xl font-bold shadow-lg flex items-center gap-2 transition-transform hover:scale-105"
@@ -262,12 +262,12 @@ export const StudyMode: React.FC<StudyModeProps> = ({ deck, onExit, onMarkStudie
         >
           {/* Front (Question) */}
           <div 
-             className="absolute inset-0 w-full h-full bg-white border border-slate-200 rounded-2xl shadow-xl p-6 md:p-8 flex flex-col backface-hidden overflow-y-auto"
+             className="absolute inset-0 w-full h-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-xl p-6 md:p-8 flex flex-col backface-hidden overflow-y-auto"
           >
              {/* Quiz Status Banner */}
              {quizStatus !== 'neutral' && (
                 <div className={`mb-4 p-3 rounded-lg text-sm font-bold flex items-center justify-center gap-2 animate-in slide-in-from-top-2 ${
-                    quizStatus === 'correct' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+                    quizStatus === 'correct' ? 'bg-green-100 dark:bg-green-900/50 text-green-700 dark:text-green-300' : 'bg-red-100 dark:bg-red-900/50 text-red-700 dark:text-red-300'
                 }`}>
                     {quizStatus === 'correct' ? <Check size={18} /> : <AlertTriangle size={18} />}
                     {quizStatus === 'correct' ? 'Resposta Correta!' : 'Resposta Incorreta. Tente novamente.'}
@@ -276,11 +276,11 @@ export const StudyMode: React.FC<StudyModeProps> = ({ deck, onExit, onMarkStudie
 
             <div className="flex-1 flex flex-col items-center justify-center text-center">
                 <div className="flex items-center gap-2 mb-6">
-                    <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Pergunta</span>
+                    <span className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Pergunta</span>
                     <DifficultyBadge level={currentCard.difficulty} />
                 </div>
                 
-                <p className="text-xl md:text-2xl font-medium text-slate-800 leading-relaxed mb-8">
+                <p className="text-xl md:text-2xl font-medium text-slate-800 dark:text-slate-100 leading-relaxed mb-8">
                   {currentCard.front}
                 </p>
 
@@ -288,14 +288,14 @@ export const StudyMode: React.FC<StudyModeProps> = ({ deck, onExit, onMarkStudie
                 {!isFlipped && hasOptions && showOptions && (
                     <div className="w-full space-y-3 animate-in fade-in slide-in-from-bottom-4">
                         {currentCard.options!.map((option, idx) => {
-                            let btnClass = "w-full p-3 text-left rounded-lg border border-slate-200 text-slate-700 hover:bg-slate-50 transition-colors text-sm md:text-base";
+                            let btnClass = "w-full p-3 text-left rounded-lg border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors text-sm md:text-base";
                             
                             // Styling based on selection and correctness
                             if (quizStatus !== 'neutral') {
                                 if (option === currentCard.correctAnswer) {
-                                     btnClass = "w-full p-3 text-left rounded-lg border border-green-300 bg-green-50 text-green-800 font-medium";
+                                     btnClass = "w-full p-3 text-left rounded-lg border border-green-300 dark:border-green-700 bg-green-50 dark:bg-green-900/30 text-green-800 dark:text-green-300 font-medium";
                                 } else if (option === selectedOption && quizStatus === 'wrong') {
-                                     btnClass = "w-full p-3 text-left rounded-lg border border-red-300 bg-red-50 text-red-800";
+                                     btnClass = "w-full p-3 text-left rounded-lg border border-red-300 dark:border-red-700 bg-red-50 dark:bg-red-900/30 text-red-800 dark:text-red-300";
                                 } else {
                                      btnClass += " opacity-60";
                                 }
@@ -320,7 +320,7 @@ export const StudyMode: React.FC<StudyModeProps> = ({ deck, onExit, onMarkStudie
                  {!showOptions && hasOptions && (
                     <button
                         onClick={(e) => { e.stopPropagation(); setShowOptions(true); }}
-                        className="flex items-center gap-2 px-4 py-2 bg-indigo-50 text-indigo-700 rounded-full font-medium hover:bg-indigo-100 transition-colors"
+                        className="flex items-center gap-2 px-4 py-2 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 rounded-full font-medium hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-colors"
                     >
                         <List size={18} />
                         Mostrar Opções
@@ -328,7 +328,7 @@ export const StudyMode: React.FC<StudyModeProps> = ({ deck, onExit, onMarkStudie
                  )}
                  {/* Only allow manual flip if not answered correctly yet (to prevent cheating logic flow, or allow it?) */}
                  {/* Actually, always allow flip for learning */}
-                 <p className="text-slate-400 text-sm flex items-center gap-2 mt-2 cursor-pointer hover:text-primary transition-colors" onClick={() => setIsFlipped(true)}>
+                 <p className="text-slate-400 dark:text-slate-500 text-sm flex items-center gap-2 mt-2 cursor-pointer hover:text-primary dark:hover:text-blue-400 transition-colors" onClick={() => setIsFlipped(true)}>
                     <RotateCw size={14} /> Clique para virar
                  </p>
             </div>
