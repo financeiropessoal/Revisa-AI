@@ -33,10 +33,19 @@ export const GeneratorModal: React.FC<GeneratorModalProps> = ({
       if (cards.length > 0) {
         onSuccess(subject, topic, cards);
       } else {
-        setError("Não foi possível gerar cards. Tente um tópico mais específico.");
+        setError("Não foi possível gerar cards. A resposta da IA veio vazia ou incompleta.");
       }
     } catch (err) {
-      setError("Erro de conexão com a IA. Verifique sua chave de API ou tente novamente.");
+      console.error(err);
+      const msg = err instanceof Error ? err.message : "Erro desconhecido";
+      
+      if (msg.includes("API_KEY") || msg.includes("403")) {
+          setError("Chave de API inválida ou não encontrada. Reinicie o projeto se acabou de adicionar a chave.");
+      } else if (msg.includes("404") || msg.includes("not found")) {
+          setError("Modelo de IA indisponível ou erro de conexão. Tente novamente mais tarde.");
+      } else {
+          setError(`Erro: ${msg}`);
+      }
     } finally {
       setLoading(false);
     }
@@ -151,9 +160,9 @@ export const GeneratorModal: React.FC<GeneratorModalProps> = ({
           </div>
 
           {error && (
-            <div className="mt-4 p-3 bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-300 text-sm rounded-lg flex items-start gap-2">
+            <div className="mt-4 p-3 bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-300 text-sm rounded-lg flex items-start gap-2 border border-red-100 dark:border-red-900/50">
               <AlertCircle size={16} className="mt-0.5 shrink-0" />
-              <span>{error}</span>
+              <span className="break-words">{error}</span>
             </div>
           )}
 

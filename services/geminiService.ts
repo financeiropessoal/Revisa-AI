@@ -18,8 +18,10 @@ export const generateLegalFlashcards = async (
   difficultyMode: 'easy' | 'medium' | 'hard' | 'mixed'
 ): Promise<GeneratedCardData[]> => {
   const apiKey = process.env.API_KEY;
-  if (!apiKey) {
-    throw new Error("API_KEY não encontrada. Configure as variáveis de ambiente.");
+  
+  // Verificação estrita da chave
+  if (!apiKey || apiKey.trim() === '') {
+    throw new Error("API_KEY não configurada ou vazia. Verifique as variáveis de ambiente.");
   }
 
   const ai = new GoogleGenAI({ apiKey });
@@ -90,7 +92,7 @@ export const generateLegalFlashcards = async (
     
     return JSON.parse(text) as GeneratedCardData[];
   } catch (error) {
-    console.error("Erro na geração Gemini:", error);
+    console.error("Erro detalhado na geração Gemini:", error);
     throw error;
   }
 };
