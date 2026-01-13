@@ -4,16 +4,11 @@ import react from '@vitejs/plugin-react';
 export default defineConfig({
   plugins: [react()],
   define: {
-    // Garante que a variável de ambiente API_KEY (da Vercel ou local) 
-    // seja acessível no código via process.env.API_KEY
+    // Permite o uso de process.env.API_KEY no código do front-end
     'process.env.API_KEY': JSON.stringify(process.env.API_KEY || ''),
   },
   build: {
     outDir: 'dist',
-    rollupOptions: {
-      input: {
-        main: './index.html',
-      },
-    },
-  },
+    sourcemap: false
+  }
 });
