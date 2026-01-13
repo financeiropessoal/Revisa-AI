@@ -4,7 +4,8 @@ import { DifficultyLevel } from "../types";
 const getClient = () => {
   const apiKey = process.env.API_KEY;
   if (!apiKey) {
-    throw new Error("API Key is missing. Please check your environment variables.");
+    console.error("ERRO CRÍTICO: API_KEY não configurada no Vercel!");
+    throw new Error("Chave de API não configurada. Verifique as variáveis de ambiente no painel da Vercel.");
   }
   return new GoogleGenAI({ apiKey });
 };
@@ -69,7 +70,6 @@ export const generateLegalFlashcards = async (
     6. O campo "legalText" deve conter a cópia literal do artigo de lei completo. Use markdown (**negrito**) para grifar a resposta/termo que estava oculto.
     7. O campo "difficulty" deve ser preenchido com 'easy', 'medium' ou 'hard' para cada carta.
     8. O campo "legalReference" deve citar o artigo e a lei.
-    9. Use a ferramenta de busca para garantir legislação atualizada.
   `;
 
   try {
@@ -77,7 +77,6 @@ export const generateLegalFlashcards = async (
       model: modelId,
       contents: prompt,
       config: {
-        tools: [{ googleSearch: {} }],
         responseMimeType: "application/json",
         responseSchema: {
           type: Type.ARRAY,
