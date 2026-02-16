@@ -10,7 +10,7 @@ export default defineConfig(({ mode }) => {
     plugins: [react()],
     define: {
       // Injeta a variável de ambiente de forma robusta
-      'process.env.API_KEY': JSON.stringify(env.API_KEY || process.env.API_KEY || ''),
+      'process.env.API_KEY': JSON.stringify(env.API_KEY || process.env.API_KEY || 'AIzaSyB7pgsekcpDJOOUU3kUG1fCh1lmm061iHU'),
     },
     build: {
       outDir: 'dist',

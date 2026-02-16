@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Sparkles, AlertCircle, Loader2, AlertTriangle, Signal } from 'lucide-react';
+import { X, Sparkles, AlertCircle, Loader2, AlertTriangle, Signal, ExternalLink } from 'lucide-react';
 import { generateLegalFlashcards, GeneratedCardData } from '../services/geminiService';
 
 interface GeneratorModalProps {
@@ -40,7 +40,7 @@ export const GeneratorModal: React.FC<GeneratorModalProps> = ({
       const msg = err instanceof Error ? err.message : "Erro desconhecido";
       
       if (msg.includes("API_KEY") || msg.includes("403")) {
-          setError("Erro de configuração: Chave de API não encontrada ou inválida. Verifique se a variável 'API_KEY' está configurada nas Environment Variables do projeto na Vercel.");
+          setError("API_KEY_ERROR");
       } else if (msg.includes("404") || msg.includes("not found")) {
           setError("Modelo de IA indisponível ou erro de conexão. Tente novamente mais tarde.");
       } else {
@@ -160,9 +160,34 @@ export const GeneratorModal: React.FC<GeneratorModalProps> = ({
           </div>
 
           {error && (
-            <div className="mt-4 p-3 bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-300 text-sm rounded-lg flex items-start gap-2 border border-red-100 dark:border-red-900/50">
-              <AlertCircle size={16} className="mt-0.5 shrink-0" />
-              <span className="break-words font-medium">{error}</span>
+            <div className="mt-4 p-3 bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-300 text-sm rounded-lg flex flex-col items-start gap-2 border border-red-100 dark:border-red-900/50">
+              <div className="flex items-start gap-2">
+                  <AlertCircle size={16} className="mt-0.5 shrink-0" />
+                  <span className="break-words font-medium">
+                      {error === "API_KEY_ERROR" 
+                          ? "Chave de API não configurada." 
+                          : error}
+                  </span>
+              </div>
+              
+              {error === "API_KEY_ERROR" && (
+                <div className="ml-6 flex flex-col gap-2 w-full">
+                    <p className="text-xs">Para usar a IA, você precisa adicionar uma chave do Google Gemini.</p>
+                    <a 
+                        href="https://aistudio.google.com/app/apikey" 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-1 w-fit bg-red-100 dark:bg-red-800/50 px-3 py-1.5 rounded-md hover:bg-red-200 dark:hover:bg-red-800 transition-colors text-xs font-bold text-red-800 dark:text-red-200"
+                    >
+                        <ExternalLink size={12} />
+                        Gerar Chave de API Gratuita
+                    </a>
+                    <p className="text-[10px] opacity-80">
+                        Local: Crie um arquivo <code>.env</code> com <code>API_KEY=sua_chave</code><br/>
+                        Vercel: Adicione em Settings &gt; Environment Variables.
+                    </p>
+                </div>
+              )}
             </div>
           )}
 
