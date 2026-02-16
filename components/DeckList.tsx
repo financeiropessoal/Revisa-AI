@@ -31,6 +31,16 @@ export const DeckList: React.FC<DeckListProps> = ({ decks, onSelectDeck, onDelet
     return decks.reduce((acc, deck) => acc + deck.cards.length, 0);
   }, [decks]);
 
+  const handleDeleteClick = (e: React.MouseEvent, id: string, type: 'deck' | 'subject') => {
+      e.stopPropagation();
+      e.preventDefault();
+      if (type === 'deck') {
+          onDeleteDeck(id);
+      } else {
+          onDeleteSubject(id);
+      }
+  };
+
   if (selectedSubject) {
     // VIEW: List of Decks within a Subject
     return (
@@ -56,18 +66,20 @@ export const DeckList: React.FC<DeckListProps> = ({ decks, onSelectDeck, onDelet
               <div
                 key={deck.id}
                 className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 hover:shadow-md transition-shadow p-5 flex flex-col justify-between group cursor-pointer relative"
-                onClick={() => onSelectDeck(deck)}
+                onClick={(e) => {
+                    // Safety check: ensure we didn't click the delete button
+                    if ((e.target as HTMLElement).closest('.delete-btn')) return;
+                    onSelectDeck(deck);
+                }}
               >
-                {/* Delete Button - Positioned Absolute for better click handling */}
+                {/* Delete Button */}
                 <button 
-                    onClick={(e) => { 
-                      e.stopPropagation(); 
-                      onDeleteDeck(deck.id); 
-                    }}
-                    className="absolute top-4 right-4 text-slate-300 dark:text-slate-600 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 p-2 rounded-full transition-all z-20"
+                    type="button"
+                    onClick={(e) => handleDeleteClick(e, deck.id, 'deck')}
+                    className="delete-btn absolute top-4 right-4 text-slate-300 dark:text-slate-600 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 p-2 rounded-full transition-all z-20"
                     title="Excluir este baralho"
                 >
-                    <Trash2 size={20} />
+                    <Trash2 size={20} className="pointer-events-none" />
                 </button>
 
                 <div>
@@ -159,17 +171,18 @@ export const DeckList: React.FC<DeckListProps> = ({ decks, onSelectDeck, onDelet
               <div
                 key={subject}
                 className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 hover:shadow-md hover:border-blue-300 dark:hover:border-blue-500 transition-all p-5 cursor-pointer flex flex-col items-center text-center gap-4 group relative overflow-hidden"
-                onClick={() => setSelectedSubject(subject)}
+                onClick={(e) => {
+                    if ((e.target as HTMLElement).closest('.delete-btn')) return;
+                    setSelectedSubject(subject);
+                }}
               >
                  <button 
-                    onClick={(e) => { 
-                      e.stopPropagation(); 
-                      onDeleteSubject(subject); 
-                    }}
-                    className="absolute top-2 right-2 p-2 text-slate-300 dark:text-slate-600 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-full transition-all z-20 opacity-0 group-hover:opacity-100"
+                    type="button"
+                    onClick={(e) => handleDeleteClick(e, subject, 'subject')}
+                    className="delete-btn absolute top-2 right-2 p-2 text-slate-300 dark:text-slate-600 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-full transition-all z-20 opacity-0 group-hover:opacity-100"
                     title={`Excluir toda a matéria: ${subject}`}
                 >
-                    <Trash2 size={18} />
+                    <Trash2 size={18} className="pointer-events-none" />
                 </button>
 
                 <div className="bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-500 p-4 rounded-full group-hover:scale-110 transition-transform">
