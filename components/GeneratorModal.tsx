@@ -140,7 +140,7 @@ export const GeneratorModal: React.FC<GeneratorModalProps> = ({
               <input
                 type="range"
                 min="3"
-                max="30"
+                max="15"
                 value={quantity}
                 onChange={(e) => setQuantity(Number(e.target.value))}
                 disabled={loading}
@@ -149,7 +149,7 @@ export const GeneratorModal: React.FC<GeneratorModalProps> = ({
               <div className="flex justify-between text-xs text-slate-500 dark:text-slate-400 mt-1">
                 <span>3</span>
                 <span className="font-bold text-primary dark:text-blue-400 text-base">{quantity}</span>
-                <span>30</span>
+                <span>15</span>
               </div>
             </div>
           </div>
