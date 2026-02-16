@@ -10,14 +10,16 @@ export const generateLegalFlashcards = async (
   quantity: number,
   difficultyMode: 'easy' | 'medium' | 'hard' | 'mixed'
 ): Promise<GeneratedCardData[]> => {
+  // Guidelines: The API key must be obtained exclusively from the environment variable process.env.API_KEY.
+  // We assume this is pre-configured via Vite's define plugin.
   const apiKey = process.env.API_KEY;
   
-  // Verificação estrita da chave
-  if (!apiKey || apiKey.trim() === '' || apiKey === 'undefined') {
-    throw new Error("API_KEY_MISSING: A chave de API não foi encontrada. Verifique as Variáveis de Ambiente no painel da Vercel.");
+  if (!apiKey) {
+    throw new Error("API_KEY_MISSING: Chave de API inválida ou não encontrada.");
   }
 
   const ai = new GoogleGenAI({ apiKey });
+  // Usando o modelo flash mais recente e estável para garantir compatibilidade
   const model = "gemini-3-flash-preview"; 
 
   let difficultyInstruction = "";
