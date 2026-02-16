@@ -4,57 +4,33 @@ import { GeneratedCardData, DifficultyLevel } from "../types";
 // Re-export interface for use in other files
 export type { GeneratedCardData };
 
-export const generateLegalFlashcards = async (
+const generateBatch = async (
+  ai: GoogleGenAI,
+  model: string,
   subject: string,
   topic: string,
-  quantity: number,
-  difficultyMode: 'easy' | 'medium' | 'hard' | 'mixed'
+  count: number,
+  difficultyInstruction: string
 ): Promise<GeneratedCardData[]> => {
-  // Guidelines: The API key must be obtained exclusively from the environment variable process.env.API_KEY.
-  // We assume this is pre-configured via Vite's define plugin.
-  const apiKey = process.env.API_KEY;
-  
-  if (!apiKey) {
-    throw new Error("API_KEY_MISSING: Chave de API inválida ou não encontrada.");
-  }
-
-  const ai = new GoogleGenAI({ apiKey });
-  // Usando o modelo flash mais recente e estável para garantir compatibilidade
-  const model = "gemini-3-flash-preview"; 
-
-  let difficultyInstruction = "";
-  switch (difficultyMode) {
-    case 'easy':
-        difficultyInstruction = "Nível BÁSICO (Padrão Banca Examinadora): Foco na literalidade da lei, mas cobrando prazos, quóruns e palavras-chave que confundem (ex: 'poderá' vs 'deverá', 'salvo' vs 'inclusive'). NÃO crie perguntas óbvias ou ingênuas.";
-        break;
-    case 'medium':
-        difficultyInstruction = "Nível INTERMEDIÁRIO: Situações hipotéticas (casos práticos) que exigem a aplicação da lei (subsunção). Exige distinção clara entre conceitos semelhantes.";
-        break;
-    case 'hard':
-        difficultyInstruction = "Nível AVANÇADO: Cobrança de exceções das exceções, parágrafos pouco lidos, competências exclusivas vs privativas, e detalhes minuciosos. Estilo 'pegadinha' de alto nível.";
-        break;
-    case 'mixed':
-        difficultyInstruction = "Mistura equilibrada: 30% literais com pegadinhas (básico), 40% casos práticos (médio), 30% detalhes obscuros e exceções (avançado).";
-        break;
-  }
+  // Random seed to ensure variety across parallel batches
+  const seed = Math.floor(Math.random() * 1000000);
 
   const prompt = `
-    Atue como um EXAMINADOR RIGOROSO de concursos públicos de alto nível (Juiz, Promotor, Defensor).
-    Gere ${quantity} flashcards focados EXCLUSIVAMENTE na "Lei Seca" (texto legal).
+    Atue como um EXAMINADOR de concursos.
+    Gere ${count} flashcards focados EXCLUSIVAMENTE na "Lei Seca" (texto legal).
     
     Matéria: "${subject}".
     Tópico: "${topic}".
     
-    Diretriz de Dificuldade: ${difficultyInstruction}
+    Diretriz: ${difficultyInstruction}
     
-    REGRAS RÍGIDAS DE CRIAÇÃO:
-    1. Baseie-se apenas no texto literal da lei ou tratados vigentes.
-    2. Crie distratores (alternativas erradas) PLAUSÍVEIS. O candidato deve ficar em dúvida. Não use alternativas absurdas.
-    3. Se usar "COMPLETE A LACUNA" (max 20%), oculte palavras determinantes para o sentido jurídico, nunca artigos ou preposições irrelevantes.
-    4. Gere 4 opções de resposta.
-    5. Indique a resposta correta.
-    6. No verso (back), explique de forma técnica o erro das outras ou a lógica da correta.
-    7. No campo "legalText", coloque o artigo literal com a resposta em **negrito**.
+    REGRAS:
+    1. Baseie-se apenas no texto literal da lei.
+    2. Crie distratores (alternativas erradas) PLAUSÍVEIS.
+    3. Gere 4 opções.
+    4. Indique a correta.
+    5. No verso (back), explique o erro das outras ou a lógica.
+    6. "legalText": coloque o artigo literal com a resposta em **negrito**.
   `;
 
   try {
@@ -62,6 +38,8 @@ export const generateLegalFlashcards = async (
       model: model,
       contents: prompt,
       config: {
+        temperature: 1, // High creativity to avoid duplicates
+        seed: seed, // Random seed per batch
         responseMimeType: "application/json",
         responseSchema: {
           type: Type.ARRAY,
@@ -83,11 +61,73 @@ export const generateLegalFlashcards = async (
     });
 
     const text = response.text;
-    if (!text) throw new Error("Resposta vazia da IA");
+    if (!text) return [];
     
     return JSON.parse(text) as GeneratedCardData[];
   } catch (error) {
-    console.error("Erro detalhado na geração Gemini:", error);
+    console.warn("Erro em um lote de geração:", error);
+    return []; // Return empty for this batch so others can succeed
+  }
+};
+
+export const generateLegalFlashcards = async (
+  subject: string,
+  topic: string,
+  quantity: number,
+  difficultyMode: 'easy' | 'medium' | 'hard' | 'mixed'
+): Promise<GeneratedCardData[]> => {
+  const apiKey = process.env.API_KEY;
+  
+  if (!apiKey) {
+    throw new Error("API_KEY_MISSING: Chave de API inválida ou não encontrada.");
+  }
+
+  const ai = new GoogleGenAI({ apiKey });
+  const model = "gemini-3-flash-preview"; 
+
+  let difficultyInstruction = "";
+  switch (difficultyMode) {
+    case 'easy':
+        difficultyInstruction = "Nível BÁSICO: Literalidade, prazos e quóruns. Evite óbvio.";
+        break;
+    case 'medium':
+        difficultyInstruction = "Nível INTERMEDIÁRIO: Casos práticos e distinção de conceitos.";
+        break;
+    case 'hard':
+        difficultyInstruction = "Nível AVANÇADO: Exceções, detalhes minuciosos e pegadinhas.";
+        break;
+    case 'mixed':
+        difficultyInstruction = "Mistura: 30% literais, 40% práticos, 30% exceções difíceis.";
+        break;
+  }
+
+  // Parallelization Strategy:
+  // Break the total quantity into small batches (e.g., 5 cards per request).
+  // Run them in parallel using Promise.all.
+  // This significantly reduces the total wait time (latency) compared to generating 20+ cards sequentially.
+  
+  const BATCH_SIZE = 5;
+  const promises = [];
+  let remaining = quantity;
+
+  while (remaining > 0) {
+    const currentBatchSize = Math.min(remaining, BATCH_SIZE);
+    promises.push(generateBatch(ai, model, subject, topic, currentBatchSize, difficultyInstruction));
+    remaining -= currentBatchSize;
+  }
+
+  try {
+    const results = await Promise.all(promises);
+    // Flatten the array of arrays into a single array
+    const allCards = results.flat();
+    
+    if (allCards.length === 0) {
+        throw new Error("A IA não retornou nenhum card válido.");
+    }
+
+    return allCards;
+  } catch (error) {
+    console.error("Erro geral na geração paralela:", error);
     throw error;
   }
 };
