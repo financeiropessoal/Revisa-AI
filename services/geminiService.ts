@@ -1,15 +1,8 @@
 import { GoogleGenAI, Type } from "@google/genai";
-import { DifficultyLevel } from "../types";
+import { GeneratedCardData, DifficultyLevel } from "../types";
 
-export interface GeneratedCardData {
-  front: string;
-  back: string;
-  legalText: string;
-  legalReference: string;
-  options: string[];
-  correctAnswer: string;
-  difficulty: DifficultyLevel;
-}
+// Re-export interface for use in other files
+export type { GeneratedCardData };
 
 export const generateLegalFlashcards = async (
   subject: string,
@@ -20,8 +13,8 @@ export const generateLegalFlashcards = async (
   const apiKey = process.env.API_KEY;
   
   // Verificação estrita da chave
-  if (!apiKey || apiKey.trim() === '') {
-    throw new Error("API_KEY não configurada ou vazia. Verifique as variáveis de ambiente.");
+  if (!apiKey || apiKey.trim() === '' || apiKey === 'undefined') {
+    throw new Error("API_KEY_MISSING: A chave de API não foi encontrada. Verifique as Variáveis de Ambiente no painel da Vercel.");
   }
 
   const ai = new GoogleGenAI({ apiKey });

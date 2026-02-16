@@ -1,6 +1,16 @@
 
 export type DifficultyLevel = 'easy' | 'medium' | 'hard';
 
+export interface GeneratedCardData {
+  front: string;
+  back: string;
+  options: string[];
+  correctAnswer: string;
+  legalText: string;
+  legalReference: string;
+  difficulty: DifficultyLevel;
+}
+
 export interface Flashcard {
   id: string;
   front: string; // The question

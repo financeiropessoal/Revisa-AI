@@ -40,7 +40,7 @@ export const GeneratorModal: React.FC<GeneratorModalProps> = ({
       const msg = err instanceof Error ? err.message : "Erro desconhecido";
       
       if (msg.includes("API_KEY") || msg.includes("403")) {
-          setError("Chave de API inválida ou não encontrada. Reinicie o projeto se acabou de adicionar a chave.");
+          setError("Erro de configuração: Chave de API não encontrada ou inválida. Verifique se a variável 'API_KEY' está configurada nas Environment Variables do projeto na Vercel.");
       } else if (msg.includes("404") || msg.includes("not found")) {
           setError("Modelo de IA indisponível ou erro de conexão. Tente novamente mais tarde.");
       } else {
@@ -162,7 +162,7 @@ export const GeneratorModal: React.FC<GeneratorModalProps> = ({
           {error && (
             <div className="mt-4 p-3 bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-300 text-sm rounded-lg flex items-start gap-2 border border-red-100 dark:border-red-900/50">
               <AlertCircle size={16} className="mt-0.5 shrink-0" />
-              <span className="break-words">{error}</span>
+              <span className="break-words font-medium">{error}</span>
             </div>
           )}
 
